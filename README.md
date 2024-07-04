@@ -1,3 +1,7 @@
+# HUB XZY Tech Challenge - Backend
+
+This is a [NestJS](https://nestjs.com/) project bootstrapped with `@nestjs/cli` to build the backend for the HUB XZY Tech Challenge. The frontend for this project can be found [here](https://github.com/LizanLycan/hub-xyz-tech-ui)
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
@@ -22,14 +26,33 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
 ## Installation
 
 ```bash
 $ yarn install
+```
+
+## Environment Variables
+
+Fill in the `.env` file with the following variables to run locally:
+
+```bash
+NODE_ENV=development
+PORT=8000
+# This should be the same as the frontend env variable
+JWT_SECRET="make_it_secret_make_it_safe"
+# This DB URL is for a local sqlite testing purpouse database
+DATABASE_URL="file:./dev.db"
+# This project uses the Moralis API to get the data
+MORALIS_API_KEY="API_KEY"
+```
+
+## Prisma Database Migrations
+
+This project uses [Prisma](https://www.prisma.io/) for database migrations. To run the migrations, use the following command:
+
+```bash
+npx prisma migrate dev
 ```
 
 ## Running the app
@@ -60,13 +83,7 @@ $ yarn run test:cov
 
 ## Support
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Nest is an MIT-licensed open-source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
 ## License
 
