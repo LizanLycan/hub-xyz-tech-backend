@@ -12,14 +12,7 @@ export const TokenSchema = z.object({
   bookmarked: z.boolean(),
   user: UserSchema,
   userId: z.string(),
-  tokenId: z.number(),
-  type: TokenType,
-});
-
-export const AddTokenInputSchema = z.object({
-  address: z.string(),
-  tokenId: z.number(),
-  bookmarked: z.boolean(),
+  tokenId: z.string(),
   type: TokenType,
 });
 
@@ -30,8 +23,16 @@ export const UserToken = TokenSchema.extend({
   price: z.string(),
 });
 
-export const TokensInput = z.array(AddTokenInputSchema);
+export const AddTokenInputSchema = UserToken.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  user: true,
+  userId: true,
+  price: true,
+});
 
-export type TokenDto = z.infer<typeof TokenSchema>;
+export const TokensInput = z.array(AddTokenInputSchema);
 export type UserTokenDto = z.infer<typeof UserToken>;
+export type TokenDto = z.infer<typeof TokenSchema>;
 export type AddTokenInputDto = z.infer<typeof AddTokenInputSchema>;

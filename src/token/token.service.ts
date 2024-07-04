@@ -52,7 +52,7 @@ export class TokenService {
             name: token.name,
             symbol: token.symbol,
             logo: token.logo,
-            tokenId: 0,
+            tokenId: '0',
             type: 'token',
           })),
       ];
@@ -70,7 +70,7 @@ export class TokenService {
           name: token.name,
           symbol: token.symbol,
           logo: token.logo,
-          tokenId: 0,
+          tokenId: '0',
           type: 'token',
         }));
     }
@@ -107,6 +107,9 @@ export class TokenService {
             tokenId: token.tokenId,
             bookmarked: token.bookmarked,
             type: token.type,
+            name: token.name,
+            symbol: token.symbol,
+            logo: token.logo,
             user: { connect: { id: user } },
           },
         });
@@ -121,57 +124,58 @@ export class TokenService {
     type: TokenType,
   ): Promise<UserTokenDto[]> {
     const result = await this.prismaService.token.findMany({
+      orderBy: [
+        {
+          bookmarked: 'desc',
+        },
+        {
+          name: 'desc',
+        },
+      ],
       where: { userId: user, type },
     });
 
     const promises = Promise.all(
       result.map(async (token) => {
         if (type === 'nft') {
-          const [_nftMetadata, _nftPrice] = await Promise.all([
-            Moralis.EvmApi.nft.getNFTMetadata({
-              chain: Moralis.EvmUtils.EvmChain.ETHEREUM,
-              format: 'decimal',
-              normalizeMetadata: false,
-              mediaItems: true,
-              address: token.address,
-              tokenId: token.id,
-            }),
-            Moralis.EvmApi.nft.getNFTLowestPrice({
+          let nftPrice: Record<string, unknown> | null = null;
+
+          try {
+            const _nftPrice = await Moralis.EvmApi.nft.getNFTLowestPrice({
               chain: Moralis.EvmUtils.EvmChain.ETHEREUM,
               address: token.address,
-            }),
-          ]);
+            });
 
-          const nftMetadata = _nftMetadata.toJSON();
-          const nftPrice = _nftPrice.toJSON();
+            nftPrice = _nftPrice.toJSON();
+          } catch (error) {
+            nftPrice = null;
+          }
 
-          console.log('NFT PRICE', nftPrice);
           return {
             ...token,
-            name: nftMetadata.name,
-            symbol: nftMetadata.symbol,
-            logo:
-              nftMetadata.media?.media_collection?.medium.url ??
-              nftMetadata.media?.original_media_url ??
-              '',
-            price: `${nftPrice.price}`,
+            price: nftPrice
+              ? `${(nftPrice as unknown as { price_formatted: string }).price_formatted} ${(nftPrice as unknown as { token_symbol: string }).token_symbol}`
+              : '0.00 ETH',
           };
         }
 
-        const _tokenMetadata = await Moralis.EvmApi.token.getTokenPrice({
-          chain: Moralis.EvmUtils.EvmChain.ETHEREUM,
-          include: 'percent_change',
-          address: token.address,
-        });
+        let tokenPrice: Record<string, unknown> | null = null;
 
-        const tokenMetadata = _tokenMetadata.toJSON();
+        try {
+          const _tokenPrice = await Moralis.EvmApi.token.getTokenPrice({
+            chain: Moralis.EvmUtils.EvmChain.ETHEREUM,
+            include: 'percent_change',
+            address: token.address,
+          });
+
+          tokenPrice = _tokenPrice.toJSON();
+        } catch (error) {
+          tokenPrice = null;
+        }
 
         return {
           ...token,
-          name: tokenMetadata.tokenName,
-          symbol: tokenMetadata.tokenSymbol,
-          logo: tokenMetadata.tokenLogo,
-          price: tokenMetadata.usdPriceFormatted,
+          price: tokenPrice ? tokenPrice.usdPriceFormatted : '0.00',
         };
       }),
     );

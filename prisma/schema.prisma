@@ -23,8 +23,11 @@ model User {
 
 model Token {
   id         String   @id @default(cuid())
-  address    String   
-  tokenId    Int
+  address    String
+  name       String
+  symbol     String
+  logo       String   
+  tokenId    String
   bookmarked Boolean
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
