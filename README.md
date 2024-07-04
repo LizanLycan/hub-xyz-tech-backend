@@ -39,6 +39,7 @@ Fill in the `.env` file with the following variables to run locally:
 ```bash
 NODE_ENV=development
 PORT=8000
+ORIGIN="http://localhost:3000"
 # This should be the same as the frontend env variable
 JWT_SECRET="make_it_secret_make_it_safe"
 # This DB URL is for a local sqlite testing purpouse database
